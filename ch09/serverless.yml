@@ -1,0 +1,112 @@
+service: coffee-api-project
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: ap-northeast-2
+  stage: dev
+  deploymentBucket:
+    name: coffee-api-deploy-bucket
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/Coffees"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/Orders"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/OrderItems"
+    - Effect: Allow
+      Action:
+        - sns:Publish
+      Resource:
+        - "${env:SNS_TOPIC_ARN}"
+
+functions:
+  create-order:
+    name: create-order-api
+    handler: infrastructure/web/fastapi.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+  payment-sns-consumer:
+    name: payment-sns-consumer
+    handler: infrastructure/handlers/sns_payment_handler.handler
+    events:
+      - sns:
+          arn: ${env:SNS_TOPIC_ARN}
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    pythonBin: python3.11
+    usePipenv: false
+
+resources:
+  Resources:
+    CoffeesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Coffees
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+    
+    OrdersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Orders
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+    
+    OrderItemsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: OrderItems
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+
+package:
+  patterns:
+    - 'infrastructure/web/fastapi.py'
+    - 'infrastructure/handlers/sns_payment_handler.py'
+    - 'domain/**'
+    - 'application/**'
+    - 'adapter/**'
+    - '!tests/**'
+    - '!__pycache__/**'
+    - '!.git/**'
+    - '!.serverless/**'
+    - '!node_modules/**'

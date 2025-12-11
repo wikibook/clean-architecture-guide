@@ -1,0 +1,73 @@
+service: coffee-shop-api
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: ap-northeast-2
+  environment:
+    STAGE: ${opt:stage, 'dev'}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/menus"
+            - "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/orders"
+
+functions:
+  api:
+    handler: src.main.handler
+    events:
+      - http:
+          path: /menu
+          method: get
+      - http:
+          path: /order
+          method: post
+      - http:
+          path: /order/{orderId}
+          method: get
+
+resources:
+  Resources:
+    MenusTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: menus
+        AttributeDefinitions:
+          - AttributeName: menu_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: menu_id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    OrdersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: orders
+        AttributeDefinitions:
+          - AttributeName: order_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: order_id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+plugins:
+  - serverless-python-requirements
+
+package:
+  patterns:
+    - '!./**'
+    - src/**
+    - requirements.txt

@@ -1,0 +1,16 @@
+# FastAPI and related
+fastapi>=0.109.0
+pydantic>=2.6.0
+mangum>=0.17.0
+uvicorn>=0.27.0
+
+# Database
+SQLAlchemy>=2.0.0
+alembic>=1.13.0
+mysqlclient>=2.2.0
+python-dotenv>=1.0.0
+
+# Testing
+pytest>=8.0.0
+pytest-mock>=3.12.0
+httpx>=0.26.0

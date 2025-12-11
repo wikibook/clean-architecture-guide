@@ -1,0 +1,81 @@
+@startuml Domain Class Diagram
+
+' 스타일 설정
+skinparam class {
+    BackgroundColor<<Entity>> LightBlue
+    BackgroundColor<<ValueObject>> LightGreen
+    BorderColor Black
+    ArrowColor Black
+}
+
+' Money 값 객체
+class Money <<ValueObject>> {
+    - amount: int
+    - currency: str
+    
+    + __init__(amount: int, currency: str = "KRW")
+    + __add__(other: Money): Money
+    + __mul__(quantity: int): Money
+    + __str__(): str
+    + __repr__(): str
+    + __eq__(other: object): bool
+}
+
+' OrderStatus 값 객체
+enum OrderStatus <<ValueObject>> {
+    PENDING = "pending"
+    PREPARING = "preparing"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+}
+
+' Coffee 엔티티
+class Coffee <<Entity>> {
+    - id: str
+    - name: str
+    - price: Money
+    - description: Optional[str]
+    - stock: int
+    
+    + __init__(id: str, name: str, price: Money, description: Optional[str], stock: int)
+    + is_available(): bool
+    + reserve_stock(quantity: int): None
+}
+
+' OrderItem 엔티티
+class OrderItem <<Entity>> {
+    - id: str
+    - order_id: str
+    - coffee_id: str
+    - quantity: int
+    - unit_price: Money
+    
+    + __init__(id: str, order_id: str, coffee_id: str, quantity: int, unit_price: Money)
+    + calculate_subtotal(): Money
+}
+
+' Order 엔티티
+class Order <<Entity>> {
+    - id: str
+    - customer_id: str
+    - items: List[OrderItem]
+    - total_amount: Money
+    - status: OrderStatus
+    - created_at: datetime
+    
+    + __init__(id: str, customer_id: str)
+    + add_coffee(coffee: Coffee, quantity: int): None
+    + calculate_total(): Money
+    + change_status(new_status: OrderStatus): None
+    + can_cancel(): bool
+}
+
+' 관계 정의
+Order o--> "many" OrderItem : contains
+Order --> OrderStatus : uses
+Order --> Coffee : references
+OrderItem --> Coffee : references
+OrderItem --> Money : uses
+Coffee --> Money : uses
+
+@enduml 

@@ -1,0 +1,55 @@
+service: coffee-order-api
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: ap-northeast-2
+  environment:
+    STAGE: ${opt:stage, 'dev'}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/Menu"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/Order"
+
+functions:
+  api:
+    handler: src.interfaces.api.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+
+resources:
+  Resources:
+    MenuTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Menu
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    OrderTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Order
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST

@@ -1,0 +1,8 @@
+# Code quality tools
+pre-commit>=3.6.0
+black>=24.1.0
+isort>=5.13.2
+ruff>=0.2.0
+mypy>=1.8.0
+bandit>=1.7.7
+types-all>=1.0.0
