@@ -8,7 +8,7 @@
 - 판형: 175\*235\*15mm
 - 28,000원 | 2026년 1월 12일 발행 | 368쪽
 - [책 홈페이지](https://wikibook.co.kr/clean-architecture-guide/)
-- [도서 미리보기]()
+- [도서 미리보기](https://www.yes24.com/Product/Viewer/Preview/171028674)
 - [도서 관련 문의](https://wikibook.co.kr/support/contact/)
 
 ---
@@ -36,5 +36,5 @@
  
  - [예스24](https://www.yes24.com/product/goods/171028674)
  - [교보문고](https://product.kyobobook.co.kr/detail/S000218913876)
- - [알라딘]()
+ - [알라딘](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=382420796)
  - [쿠팡](https://www.coupang.com/vp/products/9268443731?itemId=27429191997)
